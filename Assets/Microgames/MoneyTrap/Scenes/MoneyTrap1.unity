@@ -621,12 +621,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1957115104}
-  speed: 17
-  proximityFollow: 1
-  distanceLeave: 3
+  speed: 15
+  proximityFollow: 1.4
+  distanceLeave: 3.2
   fallSpeed: 1.8
   isFacingRight: 0
   gravity: 0.1
+  slowdown: 0.3
 --- !u!212 &1948126706
 SpriteRenderer:
   m_ObjectHideFlags: 0

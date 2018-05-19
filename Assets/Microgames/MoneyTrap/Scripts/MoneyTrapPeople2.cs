@@ -34,6 +34,10 @@ public class MoneyTrapPeople2 : MonoBehaviour {
     [SerializeField]
     private float gravity = 0.1f;
 
+    [Header("Slowdown when following from afar")]
+    [SerializeField]
+    private float slowdown = 0.3f;
+
     //Possible states for the person
     enum State {Idle, Following, Falling};
 
@@ -43,6 +47,8 @@ public class MoneyTrapPeople2 : MonoBehaviour {
     private Vector2 trajectory;
     //Stores initial height
     private float floor;
+    //Store last jump height (initial trajectory)
+    private float lastJumpTrajY;
 
     // Use this for initialization
     void Start () {
@@ -75,7 +81,7 @@ public class MoneyTrapPeople2 : MonoBehaviour {
                 //has to make a new jump if continues following
                 if (isGrounded())
                 {
-                    //get the direction towards player from this object's position
+                    //get the direction towards player from this object's position and turn sprite accordingly
                     trajectory = (target.transform.position - transform.position).normalized;
                     if (target.transform.position.x > transform.position.x)
                     {
@@ -91,17 +97,29 @@ public class MoneyTrapPeople2 : MonoBehaviour {
                     //if person isn't too far away from the jewel
                     if (Mathf.Abs(transform.position.x - target.transform.position.x) < distanceLeave)
                     {
+                        //float invlerp = Mathf.InverseLerp(proximityFollow, distanceLeave, Mathf.Abs(transform.position.x - target.transform.position.x));
+                        bool applySlowdown = Mathf.Abs(transform.position.x - target.transform.position.x) > proximityFollow;
+
                         //move towards player's x position at defined speed
-                        Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
+                        Vector2 newPosition = (Vector2)transform.position + (trajectory * (applySlowdown ? (speed * slowdown) : speed) * Time.deltaTime);
                         transform.position = newPosition;
+
+                        lastJumpTrajY = trajectory.y;
                     }
                     else
+                    {
                         state = State.Idle;
+
+                        //make a stopping jump
+                        trajectory = new Vector2(0f, lastJumpTrajY * 0.6f);
+                        Vector2 newPosition = (Vector2)transform.position + trajectory * speed * Time.deltaTime;
+                        transform.position = newPosition;
+                    }
                     
                 }
                 else
                 {
-                    //jump towards player
+                    //animate jump in air
                     trajectory.y = trajectory.y - gravity;
 
                     Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
@@ -110,9 +128,19 @@ public class MoneyTrapPeople2 : MonoBehaviour {
                 }
             }
             //if person is idle and in range to follow target
-            else if(state == State.Idle && Mathf.Abs(transform.position.x - target.transform.position.x) < proximityFollow)
+            else if(state == State.Idle)
             {
-                state = State.Following;
+                if(Mathf.Abs(transform.position.x - target.transform.position.x) < proximityFollow)
+                    state = State.Following;
+                else if (!isGrounded())
+                {
+                    //animate jump in air
+                    trajectory.y = trajectory.y - gravity;
+
+                    Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
+                    newPosition.y = Mathf.Max(newPosition.y, floor);
+                    transform.position = newPosition;
+                }
             }
         }
 
