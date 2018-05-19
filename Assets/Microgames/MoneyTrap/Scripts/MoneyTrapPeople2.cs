@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoneyTrapPeople1 : MonoBehaviour {
+public class MoneyTrapPeople2 : MonoBehaviour {
 
     //Controls movement for people objects
 
@@ -26,6 +26,14 @@ public class MoneyTrapPeople1 : MonoBehaviour {
     [SerializeField]
     private float fallSpeed = 1f;
 
+    [Header("Starting facing direction")]
+    [SerializeField]
+    private bool isFacingRight;
+
+    [Header("Jumping gravity")]
+    [SerializeField]
+    private float gravity = 0.1f;
+
     //Possible states for the person
     enum State {Idle, Following, Falling};
 
@@ -33,11 +41,14 @@ public class MoneyTrapPeople1 : MonoBehaviour {
     private State state;
     //Stores the direction of movement
     private Vector2 trajectory;
+    //Stores initial height
+    private float floor;
 
     // Use this for initialization
     void Start () {
         //the person starts free
         state = State.Idle;
+        floor = transform.position.y;
 	}
 
     void OnTriggerEnter2D(Collider2D other)
@@ -58,24 +69,45 @@ public class MoneyTrapPeople1 : MonoBehaviour {
         //if this person is still not trapped
         if (state != State.Falling)
         {
-
-            //get the direction towards player from this object's position
-            trajectory = (target.transform.position - transform.position).normalized;
-            //nullify y axis for horizontal(x) movement only
-            trajectory.y = 0f;
-
+            
             //if person is following
             if (state == State.Following) {
-
-                //if person isn't too far away from the jewel
-                if (Mathf.Abs(transform.position.x - target.transform.position.x) < distanceLeave)
+                //has to make a new jump if continues following
+                if (isGrounded())
                 {
-                    //move towards player's x position at defined speed
-                    Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
-                    transform.position = newPosition;
+                    //get the direction towards player from this object's position
+                    trajectory = (target.transform.position - transform.position).normalized;
+                    if (target.transform.position.x > transform.position.x)
+                    {
+                        SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+                        sr.flipX = true;
+                    }
+                    else if(target.transform.position.x < transform.position.x)
+                    {
+                        SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+                        sr.flipX = false;
+                    }
+
+                    //if person isn't too far away from the jewel
+                    if (Mathf.Abs(transform.position.x - target.transform.position.x) < distanceLeave)
+                    {
+                        //move towards player's x position at defined speed
+                        Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
+                        transform.position = newPosition;
+                    }
+                    else
+                        state = State.Idle;
+                    
                 }
                 else
-                    state = State.Idle;
+                {
+                    //jump towards player
+                    trajectory.y = trajectory.y - gravity;
+
+                    Vector2 newPosition = (Vector2)transform.position + (trajectory * speed * Time.deltaTime);
+                    newPosition.y = Mathf.Max(newPosition.y, floor);
+                    transform.position = newPosition;
+                }
             }
             //if person is idle and in range to follow target
             else if(state == State.Idle && Mathf.Abs(transform.position.x - target.transform.position.x) < proximityFollow)
@@ -103,5 +135,10 @@ public class MoneyTrapPeople1 : MonoBehaviour {
                 transform.position = newPosition;
             }
         }
+    }
+
+    private bool isGrounded()
+    {
+        return transform.position.y <= floor;
     }
 }
