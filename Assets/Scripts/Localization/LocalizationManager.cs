@@ -11,11 +11,36 @@ public class LocalizationManager : MonoBehaviour
 	public static LocalizationManager instance;
 
     [SerializeField]
+    private Language[] languages;
+    [SerializeField]
     private string forceLanguage;
     
     private Language loadedLanguage;
 	private SerializedNestedStrings localizedText;
     private string languageString;
+
+    [System.Serializable]
+    public struct Language
+    {
+        [SerializeField]
+        private string languageID;
+        public string languageName;
+        public bool incomplete;
+        public bool disableSelect;
+        public string overrideFileName;
+        public Font overrideFont;
+        public bool forceUnbold;
+
+        public string getFileName()
+        {
+            return string.IsNullOrEmpty(overrideFileName) ? languageID : overrideFileName;
+        }
+
+        public string getLanguageID()
+        {
+            return languageID;
+        }
+    }
 
 	public void Awake ()
     {
@@ -49,8 +74,23 @@ public class LocalizationManager : MonoBehaviour
     
 	public void setLanguage(string language)
 	{
-        var lang = LanguagesData.instance.FindLanguage(language);
-        StartCoroutine(loadLanguage(lang));
+        StartCoroutine(loadLanguage(FindLanguage(language)));
+    }
+
+    public Language FindLanguage(string language)
+    {
+        foreach (Language checklanguage in languages)
+        {
+            if (checklanguage.getLanguageID().Equals(language, System.StringComparison.OrdinalIgnoreCase))
+                return checklanguage;
+        }
+        Debug.Log("Language " + language + " not found. Using English");
+        return languages[0];
+    }
+
+    public string getInLanguageName(string language)
+    {
+        return FindLanguage(language).languageName;
     }
 
     IEnumerator loadLanguage(Language language)
@@ -75,6 +115,11 @@ public class LocalizationManager : MonoBehaviour
 
         loadedLanguage = language;
         languageString = "";
+    }
+
+    public Language[] getAllLanguages()
+    {
+        return languages;
     }
 
     public string getLoadedLanguageID()

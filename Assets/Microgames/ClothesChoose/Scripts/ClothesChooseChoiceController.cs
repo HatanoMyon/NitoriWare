@@ -9,7 +9,6 @@ public class ClothesChooseChoiceController : MonoBehaviour
     public Animator[] endAnimators;
 
     public SpriteRenderer highlight;
-    public float highlightYOffset;
     public float highlightMoveDuration;
 
     public AudioClip chooseClip;
@@ -33,8 +32,7 @@ public class ClothesChooseChoiceController : MonoBehaviour
         // Plant highlight bar
         highlight.transform.SetParent(medicine.transform);
         float startY = medicine.GetCategoryHighlightPosition(currentCategory).y;
-        highlight.transform.localPosition = new Vector2(
-            highlight.transform.localPosition.x, startY + highlightYOffset);
+        highlight.transform.localPosition = new Vector2(highlight.transform.localPosition.x, startY);
     }
 
     void Update()
@@ -51,8 +49,7 @@ public class ClothesChooseChoiceController : MonoBehaviour
             }
             
             float newY = Mathf.Lerp(highlight.transform.localPosition.y, targetY, moveAmount);
-            highlight.transform.localPosition = new Vector2(
-                highlight.transform.localPosition.x, newY + highlightYOffset);
+            highlight.transform.localPosition = new Vector2(highlight.transform.localPosition.x, newY);
         }
     }
     

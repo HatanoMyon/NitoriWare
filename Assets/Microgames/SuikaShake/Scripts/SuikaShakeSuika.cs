@@ -104,9 +104,8 @@ public class SuikaShakeSuika : MonoBehaviour
 
     public void generateOffset(Collider2D spawnCollider)
     {
-        Vector2 bounds = spawnCollider.bounds.extents;
-        transform.position += spawnCollider.transform.localPosition + (Vector3)spawnCollider.offset
-            + new Vector3(Random.Range(-bounds.x, bounds.x), Random.Range(-bounds.y, bounds.y), 0f);
+        float xOffset = spawnCollider.bounds.extents.x, yOffset = spawnCollider.bounds.extents.y;
+        transform.position += (Vector3)spawnCollider.offset + new Vector3(Random.Range(-xOffset, xOffset), Random.Range(-yOffset, yOffset), 0f);
     }
 
 }

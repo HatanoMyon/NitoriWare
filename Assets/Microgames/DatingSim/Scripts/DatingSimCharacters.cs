@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Microgame Assets/DatingSim/Character Roster")]
-public class DatingSimCharacters : ScriptableObject
+public class DatingSimCharacters : MonoBehaviour
 {
     [SerializeField]
     public List<Character> characters;

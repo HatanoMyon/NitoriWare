@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using System;
 
 public class CompilationStage : Stage
@@ -9,7 +8,7 @@ public class CompilationStage : Stage
 	[SerializeField]
 	protected int microgamesPerRound = 20, microgamesPerSpeedChange = 4;
 	[SerializeField]
-	private MicrogameTraits.Milestone restriction = MicrogameTraits.Milestone.StageReady;
+	private MicrogameCollection.Restriction restriction = MicrogameCollection.Restriction.StageReady;
 	[SerializeField]
 	protected Interruption nextRound;
     [SerializeField]
@@ -22,9 +21,7 @@ public class CompilationStage : Stage
 
 	public override void onStageStart()
 	{
-		microgamePool = (from microgame in MicrogameHelper.getMicrogames(restriction)
-                        select new Microgame(microgame.microgameId))
-                        .ToList();
+		microgamePool = MicrogameHelper.getMicrogames(restriction);
         roundsCompleted = roundStartIndex = 0;
         
         shuffleRandom = new System.Random(seed == 0 ? (int)System.DateTime.Now.Ticks : seed);

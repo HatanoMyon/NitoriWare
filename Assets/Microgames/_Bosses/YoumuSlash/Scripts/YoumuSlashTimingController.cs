@@ -42,16 +42,14 @@ public class YoumuSlashTimingController : MonoBehaviour
 
     void callMusicStart()
     {
-        if (!(onMusicStart == null))
-            onMusicStart();
+        onMusicStart();
         callOnBeat();
     }
 
     void callOnBeat()
     {
         lastInvokedBeat++;
-        if (!(onBeat == null))
-            onBeat(lastInvokedBeat);
+        onBeat(lastInvokedBeat);
 
         float nextBeatTime = (lastInvokedBeat + 1f) * timingData.BeatDuration;
         Invoke("callOnBeat", nextBeatTime - musicSource.time);
@@ -63,7 +61,7 @@ public class YoumuSlashTimingController : MonoBehaviour
     {
         if (MicrogameController.instance.isDebugMode())
         {
-            float fastSpeed = 5f;
+            float fastSpeed = 2.5f;
             if (Input.GetKeyDown(KeyCode.S))
             {
                 Time.timeScale *= fastSpeed;

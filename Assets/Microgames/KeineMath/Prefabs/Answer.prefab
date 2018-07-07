@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1734255227463392}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.95, y: 0.65, z: 0}
+  m_LocalPosition: {x: -1, y: 0.7, z: 0}
   m_LocalScale: {x: 0.9, y: 0.9, z: 1}
   m_Children: []
   m_Father: {fileID: 4702657076930036}
@@ -127,7 +127,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.1, y: 2.3}
+  m_Size: {x: 3.1, y: 3.53}
   m_EdgeRadius: 0
 --- !u!114 &114418811521912154
 MonoBehaviour:
@@ -151,18 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e0b2d2969a40b46b06072c16bfb875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iconsPerRow: 4
-  horizoncalIconGap: 0.6
-  verticalIconGap: 0.8
   value: 0
-  answerColor: {r: 0, g: 0, b: 0, a: 0}
-  isCorrect: 0
-  answerTerm: {fileID: 0}
-  bg: {fileID: 0}
-  chalkboard: {fileID: 0}
-  correctSymbol: {fileID: 0}
-  hundredSymbol: {fileID: 0}
-  incorrectSymbol: {fileID: 0}
 --- !u!114 &114738591361095858
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -260,7 +249,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dfe03f6f01263ee42bdc3027f5c74693, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 55cdefa496898db43aea5b1bcb63aad3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

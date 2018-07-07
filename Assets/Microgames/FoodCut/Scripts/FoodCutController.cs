@@ -20,38 +20,21 @@ public class FoodCutController : MonoBehaviour {
     [SerializeField]
     private int cutsNeeded = 1;
 
-
     private Collider2D knifeCollider;
     private int cutCount = 0;
     private Collider2D currentTrigger = null;
-    private bool isCutting = false;
-    public GameObject knifeChild;
-    public GameObject xChild;
 
 
     // Use this for initialization
     void Start ()
     {
-        transform.position = new Vector2(Random.Range(minX, maxX), transform.position.y);
     }
 
     // Update is called once per frame
     void Update()
     {
         // Handle Movement
-        if (!isCutting)
-        {
-            transform.Translate(Input.GetAxisRaw("Horizontal") * Time.deltaTime * speed, 0f, 0f);
-        }
-
-        if (knifeChild.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("FoodCutKnife")
-            || xChild.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("FoodCutX")) 
-        {
-            isCutting = true;
-        } else
-        {
-            isCutting = false;
-        }
+        transform.Translate(Input.GetAxisRaw("Horizontal") * Time.deltaTime * speed, 0f, 0f);
 
         // Restrict Movement
         if (transform.position.x <= minX)
@@ -69,10 +52,6 @@ public class FoodCutController : MonoBehaviour {
             Debug.Log("Object Cut");
             Destroy(currentTrigger.gameObject);
             currentTrigger = null;
-            knifeChild.GetComponent<Animator>().Play("FoodCutKnife");
-        } else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            xChild.GetComponent<Animator>().Play("FoodCutX");
         }
 
         if (cutCount == cutsNeeded)

@@ -21,8 +21,6 @@ public class BeachBallBallLauncher : MonoBehaviour
     private BoxCollider2D ballStandCollider;
     private Animation sealAnimation;
 
-    public BeachBallHoopParamsRandomizer hoopAnimationControl;
-
     public bool Launched { get; private set; }
 
     void Start()
@@ -30,7 +28,6 @@ public class BeachBallBallLauncher : MonoBehaviour
         physicsModel = GetComponent<Rigidbody2D>();
         scaleMultiplier = GetComponent<BeachBallScaler>();
         sealAnimation = GameObject.Find("Seal").GetComponent<Animation>();
-        hoopAnimationControl = FindObjectOfType<BeachBallHoopParamsRandomizer>();
     }
 
     void Update()
@@ -47,8 +44,6 @@ public class BeachBallBallLauncher : MonoBehaviour
             physicsModel.gravityScale = ThrowMultiplier;
             physicsModel.AddForce(ThrowDirection.normalized *
                 (float)System.Math.Sqrt(ThrowMultiplier) * ThrowConstant);
-
-            hoopAnimationControl.onToss();
 
             MicrogameController.instance.playSFX(launchSound, volume: 0.5f,
                 panStereo: AudioHelper.getAudioPan(transform.position.x));

@@ -1,94 +1,80 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(menuName = "Microgame Traits")]
-public class MicrogameTraits : ScriptableObject
+public class MicrogameTraits : MonoBehaviour
 {
+#pragma warning disable 0649
     [SerializeField]
 	private ControlScheme _controlScheme;
-	public virtual ControlScheme controlScheme => _controlScheme;
-    public enum ControlScheme
-    {
-        Key,
-        Mouse
-    }
+	public virtual ControlScheme controlScheme { get { return _controlScheme; } set { } }
 
-    [SerializeField]
+	[SerializeField]
 	private bool _hideCursor;
-	public virtual bool hideCursor => _hideCursor;
+	public virtual bool hideCursor { get { return _hideCursor; } set { } }
 
     [SerializeField]
     private CursorLockMode _cursorLockState = CursorLockMode.None;
-    public virtual CursorLockMode cursorLockState => _cursorLockState;
+    public virtual CursorLockMode cursorLockState { get { return _cursorLockState; } set { _cursorLockState = value; } }
 
     [SerializeField]
 	private Duration _duration;
-	public virtual Duration duration => _duration;
-    public enum Duration
-    {
-        Short8Beats,
-        Long16Beats
-    }
-	public virtual bool canEndEarly => _duration == Duration.Long16Beats;
+	public virtual Duration duration { get { return _duration; } set { } }
 
-    [SerializeField]
+	[SerializeField]
+	private bool _canEndEarly;
+	public virtual bool canEndEarly { get { return _canEndEarly; } set { } }
+
+	[SerializeField]
 	private string _command;
-	public virtual string command => _command;
-    public virtual string commandKey => "command";
-    public virtual string localizedCommand => TextHelper.getLocalizedText($"microgame.{microgameId}.{commandKey}", command);
+	public virtual string command { get { return _command; } set { } }
+	public virtual string localizedCommand { get { return TextHelper.getLocalizedText("microgame." + microgameId + ".command", command); } set { } }
 
 	[SerializeField]
 	private bool _defaultVictory;
-	public virtual bool defaultVictory => _defaultVictory;
+	public virtual bool defaultVictory { get { return _defaultVictory; } set { } }
 
-    [SerializeField]
-    private float _victoryVoiceDelay;
-    private float instanceVictoryVoiceDelay;
-	public virtual float victoryVoiceDelay {get {return instanceVictoryVoiceDelay; } 
-        set { instanceVictoryVoiceDelay = value; }}
+	[SerializeField]
+	private float _victoryVoiceDelay, _failureVoiceDelay;
+	public virtual float victoryVoiceDelay { get { return _victoryVoiceDelay; } set { } }
+	public virtual float failureVoiceDelay { get { return _failureVoiceDelay; } set { } }
 
-    [SerializeField]
-    private float _failureVoiceDelay;
-    private float instanceFailureVoiceDelay;
-	public virtual float failureVoiceDelay {get {return instanceFailureVoiceDelay; } 
-        set { instanceFailureVoiceDelay = value; }}
-
-    [SerializeField]
+	[SerializeField]
 	private AudioClip _musicClip;
-    public virtual AudioClip musicClip => _musicClip;
+	public virtual AudioClip musicClip{ get { return _musicClip; } set { } }
 
-    [SerializeField]
-	private Milestone _milestone = Milestone.Unfinished;
-	public virtual Milestone milestone => _milestone;
-    public enum Milestone
-    {
-        Unfinished,
-        StageReady,
-        Finished
-    }
+	[SerializeField]
+	private bool _isStageReady;
+	public virtual bool isStageReady { get { return _isStageReady; } set { } }
 
     [SerializeField]
     private string[] _credits;
-    public virtual string[] credits => _credits;
+    public virtual string[] credits { get { return _credits; } set { } }
+#pragma warning restore 0649
 
     private string _microgameId;
-    public string microgameId => _microgameId;
-    private int _difficulty;
-    public int difficulty => _difficulty;
+	public string microgameId { get { return _microgameId; } set { } }
 
-	public virtual void onAccessInStage(string microgameId, int difficulty)
+	public enum ControlScheme
 	{
-        instanceVictoryVoiceDelay = _victoryVoiceDelay;
-        instanceFailureVoiceDelay = _failureVoiceDelay;
+		Key,
+		Mouse
+	}
+
+	public enum Duration
+	{
+		Short8Beats,
+		Long16Beats
+	}
+
+	public virtual void onAccessInStage(string microgameId)
+	{
 		_microgameId = microgameId;
-        _difficulty = difficulty;
 	}
 
 	public virtual float getDurationInBeats()
@@ -96,48 +82,32 @@ public class MicrogameTraits : ScriptableObject
 		return duration == Duration.Long16Beats ? 16f : 8f;
 	}
 
-    public bool isBossMicrogame()
-    {
-        return GetType() == typeof(MicrogameBossTraits);
-    }
-
-    public static MicrogameTraits findMicrogameTraits(string microgameId, int difficulty)
+	public static MicrogameTraits findMicrogameTraits(string microgameId, int difficulty, bool skipFinishedFolder = false)
     {
 #if UNITY_EDITOR
-        MicrogameTraits traits;
+        GameObject traits;
 
-        //Search normal games
-        traits = findMicrogameTraitsInFolder($"Assets{MicrogameCollection.MicrogameAssetPath}{microgameId}", difficulty);
-        if (traits != null)
-            return traits;
 
-        //Search bosses
-        traits = findMicrogameTraitsInFolder($"Assets{MicrogameCollection.MicrogameAssetPath}_Bosses/{microgameId}", difficulty);
-        if (traits != null)
-            return traits;
+        if (!skipFinishedFolder)
+		{
+			traits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets" + MicrogameCollection.MicrogameAssetPath + "_Finished/" + microgameId + "/Traits" + difficulty.ToString() + ".prefab");
+			if (traits != null)
+				return traits.GetComponent<MicrogameTraits>();
+		}
 
-        Debug.LogError("Can't find Traits prefab for " + microgameId + difficulty.ToString());
-        return null;
-    }
-    static MicrogameTraits findMicrogameTraitsInFolder(string microgameFolder, int difficulty)
-    {
-        string fileName = "Traits";
-        string extension = ".asset";
+		traits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets" + MicrogameCollection.MicrogameAssetPath + microgameId + "/Traits" + difficulty.ToString() + ".prefab");
+		if (traits != null)
+			return traits.GetComponent<MicrogameTraits>();
 
-        //Look in Traits.asset
-        MicrogameTraits traits = AssetDatabase.LoadAssetAtPath<MicrogameTraits>($"{microgameFolder}/{fileName}{extension}");
-        if (traits != null)
-            return traits;
-        //Look in Traits[diff].asset
-        traits = AssetDatabase.LoadAssetAtPath<MicrogameTraits>($"{microgameFolder}/{fileName}{difficulty.ToString()}{extension}");
-        if (traits != null)
-            return traits;
+		traits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets" + MicrogameCollection.MicrogameAssetPath + "_Bosses/" + microgameId + "/Traits" + difficulty.ToString() + ".prefab");
+		if (traits != null)
+			return traits.GetComponent<MicrogameTraits>();
 
-        return null;
-        }
+		Debug.LogError("Can't find Traits prefab for " + microgameId + difficulty.ToString());
+		return null;
 #else
         Debug.LogError("Microgame updates should NOT be called outside of the editor. You shouldn't even see this message.");
         return null;
-    }
 #endif
+    }
 }

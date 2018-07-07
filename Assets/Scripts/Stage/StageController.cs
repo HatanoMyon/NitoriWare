@@ -119,7 +119,7 @@ public class StageController : MonoBehaviour
 		{
 			MicrogameInstance newInstance = new MicrogameInstance();
             Stage.Microgame stageMicrogame = stage.getMicrogame(index);
-            newInstance.microgame = MicrogameCollection.instance.getMicrogame(stageMicrogame.microgameId);
+            newInstance.microgame = GameController.instance.microgameCollection.findMicrogame(stageMicrogame.microgameId);
 			newInstance.difficulty = stage.getMicrogameDifficulty(stageMicrogame, index);
 			StartCoroutine(loadMicrogameAsync(newInstance));
 			microgameQueue.Enqueue(newInstance);
@@ -396,7 +396,7 @@ public class StageController : MonoBehaviour
 
 		MicrogameInstance instance = getCurrentMicrogameInstance();
         microgameTraits = instance.microgame.difficultyTraits[instance.difficulty - 1];
-		microgameTraits.onAccessInStage(instance.microgame.microgameId, instance.difficulty);
+		microgameTraits.onAccessInStage(instance.microgame.microgameId);
 	}
 
 	public float getBeatsRemaining()
@@ -556,7 +556,7 @@ public class StageController : MonoBehaviour
 		voicePlayer.playClip(microgameVictoryStatus,
 			getMicrogameVictory() ? microgameTraits.victoryVoiceDelay : microgameTraits.failureVoiceDelay);
 
-		if (microgameTraits.isBossMicrogame())
+		if (microgameTraits.GetType() == typeof(MicrogameBossTraits))
 		{
 			float endInBeats = microgameVictoryStatus ? ((MicrogameBossTraits)microgameTraits).victoryEndBeats
 				: ((MicrogameBossTraits)microgameTraits).failureEndBeats;

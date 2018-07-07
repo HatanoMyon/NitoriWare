@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 public class MenuPracticeMicrogame : MonoBehaviour
 {
@@ -37,13 +36,11 @@ public class MenuPracticeMicrogame : MonoBehaviour
 	{
         selectedInstance = null;
         if (microgamePool == null)
-            microgamePool = MicrogameHelper.getMicrogames(MicrogameTraits.Milestone.StageReady);
+            microgamePool = GameController.instance.microgameCollection.getCollectionMicrogames(MicrogameCollection.Restriction.StageReady);
 
         if (name.Contains("Boss"))
         {
-            //TODO multiple boss microgame support
-            microgame = MicrogameHelper.getMicrogames(MicrogameTraits.Milestone.StageReady, true)
-                .FirstOrDefault(a => a.difficultyTraits[0].isBossMicrogame());
+            microgame = GameController.instance.microgameCollection.getCollectionBossMicrogames()[0];
         }
         else
         {

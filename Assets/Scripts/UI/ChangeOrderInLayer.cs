@@ -4,22 +4,15 @@ using System.Collections;
 [ExecuteInEditMode]
 public class ChangeOrderInLayer : MonoBehaviour
 {
+#pragma warning disable 0649
     [SerializeField]
     private Renderer _renderer;
     [SerializeField]
     private int orderInLayer;
-    [SerializeField]
-    private string sortingLayer = "Default";
-    [SerializeField]
-    private bool disableOnPlay = true;
+#pragma warning restore 0649
 
-    private void Awake()
-    {
-        if (disableOnPlay && Application.isPlaying)
-            enabled = false;
-    }
 
-    void Start()
+	void Start()
 	{
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
@@ -28,9 +21,7 @@ public class ChangeOrderInLayer : MonoBehaviour
 	
 	void Update ()
 	{
-        if (orderInLayer != _renderer.sortingOrder)
-            _renderer.sortingOrder = orderInLayer;
-        if (!string.IsNullOrEmpty(sortingLayer))
-            _renderer.sortingLayerName = sortingLayer;
+		if (orderInLayer != _renderer.sortingOrder)
+			_renderer.sortingOrder = orderInLayer;
 	}
 }
