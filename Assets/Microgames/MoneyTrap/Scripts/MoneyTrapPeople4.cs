@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoneyTrapPeople3 : MonoBehaviour {
+public class MoneyTrapPeople4 : MonoBehaviour {
 
     //Controls movement for people objects
 
@@ -51,6 +51,8 @@ public class MoneyTrapPeople3 : MonoBehaviour {
     private float floor;
     //Store last jump height (initial trajectory)
     private float lastJumpTrajY;
+    //Store jump speedup progress
+    private float speedup = 0;
 
     // Use this for initialization
     void Start () {
@@ -77,7 +79,7 @@ public class MoneyTrapPeople3 : MonoBehaviour {
         //if this person is still not trapped
         if (state != State.Falling)
         {
-            float invlerp = Mathf.InverseLerp(proximityFollow, 0f, Mathf.Abs(transform.position.x - target.transform.position.x)) * 0.65f;
+            
 
             //if person is following
             if (state == State.Following) {
@@ -103,10 +105,11 @@ public class MoneyTrapPeople3 : MonoBehaviour {
                     {
                         //move towards player's x position at defined speed
                         Vector2 newPosition = transform.position;
-                        if (jumpTrajectory.x == 0)
-                            newPosition.x = newPosition.x + trajectory.x * speedX * Time.deltaTime;  // only make a jump from scratch if not in continuous jumping
+                        if (speedup < 1)
+                            speedup = speedup + 0.2f;
+                        newPosition.x = newPosition.x + trajectory.x * speedup * speedX * Time.deltaTime;  // only make a jump from scratch if not in continuous jumping
 
-                        newPosition.y = newPosition.y + trajectory.y * speedY * Time.deltaTime;
+                        newPosition.y = newPosition.y + speedY * Time.deltaTime;
                         transform.position = newPosition;
 
                         jumpTrajectory = trajectory;
@@ -116,6 +119,7 @@ public class MoneyTrapPeople3 : MonoBehaviour {
                     {
                         state = State.Idle;
 
+                        speedup = 0f;
                         //make a stopping jump
                         jumpTrajectory = new Vector2(0f, lastJumpTrajY * 0.6f);
                         Vector2 newPosition = transform.position;
@@ -127,21 +131,15 @@ public class MoneyTrapPeople3 : MonoBehaviour {
                 }
                 else
                 {
+                    if (speedup < 1)
+                        speedup = speedup + 0.2f;
                     //animate jump in air
                     jumpTrajectory.y = jumpTrajectory.y - gravity;
-                    //if (Mathf.Abs(jumpTrajectory.x + trajectory.x * 0.25f) < speedX)  // if not exceeding max speed
-                        jumpTrajectory.x = jumpTrajectory.x + trajectory.x * 0.25f;  //change direction in air
-                    /*else
-                    {
-                        if (trajectory.x < 0)
-                            jumpTrajectory.x = jumpTrajectory.x - speedX;
-                        else
-                            jumpTrajectory.x = jumpTrajectory.x - speedX;
-                    */
-
+                    jumpTrajectory.x = jumpTrajectory.x + trajectory.x * 0.2f;  //change direction in air
+                    
                     //move towards player's x position at defined speed
                     Vector2 newPosition = transform.position;
-                    newPosition.x = newPosition.x + jumpTrajectory.x * speedX * Time.deltaTime;
+                    newPosition.x = newPosition.x + jumpTrajectory.x * speedup * speedX * Time.deltaTime;
                     newPosition.y = newPosition.y + jumpTrajectory.y * speedY * Time.deltaTime;
                     //avoid clipping underground
                     newPosition.y = Mathf.Max(newPosition.y, floor);
